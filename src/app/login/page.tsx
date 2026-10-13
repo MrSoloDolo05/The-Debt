@@ -43,8 +43,8 @@ export default async function LoginPage() {
         <div className="brut-cell">
           <p className="mono-meta">[ TERMINAL // SIGN IN ]</p>
           <form action={signInAction} style={{ display: 'grid', gap: 8, marginTop: 16 }}>
-            <input name="email" type="email" placeholder="OPERATOR EMAIL" required className="brut-input" />
-            <input name="password" type="password" placeholder="PASSPHRASE" required className="brut-input" />
+            <input name="email" type="email" placeholder="OPERATOR EMAIL" required autoComplete="email" autoCapitalize="none" autoCorrect="off" spellCheck={false} maxLength={254} className="brut-input" />
+            <input name="password" type="password" placeholder="PASSPHRASE" required autoComplete="current-password" className="brut-input" />
             <button type="submit" className="brut-btn brut-btn-amber">
               AUTHENTICATE
             </button>
@@ -53,8 +53,8 @@ export default async function LoginPage() {
         <div className="brut-cell">
           <p className="mono-meta">[ TERMINAL // NEW OPERATOR ]</p>
           <form action={signUpAction} style={{ display: 'grid', gap: 8, marginTop: 16 }}>
-            <input name="email" type="email" placeholder="OPERATOR EMAIL" required className="brut-input" />
-            <input name="password" type="password" placeholder="PASSPHRASE" required className="brut-input" />
+            <input name="email" type="email" placeholder="OPERATOR EMAIL" required autoComplete="email" autoCapitalize="none" autoCorrect="off" spellCheck={false} maxLength={254} className="brut-input" />
+            <input name="password" type="password" placeholder="PASSPHRASE" required autoComplete="new-password" className="brut-input" />
             <button type="submit" className="brut-btn">
               REGISTER
             </button>
