@@ -1,0 +1,5 @@
+1. "The Debt" is a multi-tenant underworld ledger for independent shadow brokers managing collateralized leverage, favors, and high-risk client obligations.
+2. Without a secure digital ledger, uncoordinated calls on leverage, untracked favors, and cross-broker visibility leaks lead to catastrophic operational failure.
+3. Demo Flow: Log in as Broker A -> Register a high-profile Client -> Issue a Marker linked to that client -> View leverage volume and risk category charts -> Log out -> Log in as Broker B to verify total isolation of data via RLS (Error 42501 on unauthorized access).
+4. Tech Decisions: Next.js App Router and Supabase SSR were selected to guarantee server-side security, zero-leak multi-tenancy via PostgreSQL Row Level Security policies, and instant deployment scalability.
+5. Limitations & Next Steps: Automated satellite/GPS asset tracking is currently out of scope; future iterations will introduce multi-sig crypto escrow and automated interest escalation for defaulted markers.
