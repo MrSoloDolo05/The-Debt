@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/utils/supabase/server';
-import { signInAction, signUpAction } from '@/actions/auth';
+import { SignInForm, SignUpForm } from './login-forms';
 
 export default async function LoginPage() {
   const supabase = await createClient();
@@ -42,23 +42,11 @@ export default async function LoginPage() {
       <section style={{ padding: '3rem', display: 'grid', gap: '2rem', alignContent: 'start' }}>
         <div className="brut-cell">
           <p className="mono-meta">[ TERMINAL // SIGN IN ]</p>
-          <form action={signInAction} style={{ display: 'grid', gap: 8, marginTop: 16 }}>
-            <input name="email" type="email" placeholder="OPERATOR EMAIL" required autoComplete="email" autoCapitalize="none" autoCorrect="off" spellCheck={false} maxLength={254} className="brut-input" />
-            <input name="password" type="password" placeholder="PASSPHRASE" required autoComplete="current-password" className="brut-input" />
-            <button type="submit" className="brut-btn brut-btn-amber">
-              AUTHENTICATE
-            </button>
-          </form>
+          <SignInForm />
         </div>
         <div className="brut-cell">
           <p className="mono-meta">[ TERMINAL // NEW OPERATOR ]</p>
-          <form action={signUpAction} style={{ display: 'grid', gap: 8, marginTop: 16 }}>
-            <input name="email" type="email" placeholder="OPERATOR EMAIL" required autoComplete="email" autoCapitalize="none" autoCorrect="off" spellCheck={false} maxLength={254} className="brut-input" />
-            <input name="password" type="password" placeholder="PASSPHRASE" required autoComplete="new-password" className="brut-input" />
-            <button type="submit" className="brut-btn">
-              REGISTER
-            </button>
-          </form>
+          <SignUpForm />
         </div>
       </section>
     </main>

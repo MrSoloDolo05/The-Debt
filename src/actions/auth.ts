@@ -6,6 +6,33 @@ import { z } from 'zod';
 
 const emailSchema = z.string().email('Enter a valid operator email.');
 
+export type AuthResult = { ok: boolean; message: string | null };
+
+function fail(message: string): AuthResult {
+  return { ok: false, message };
+}
+
+// Translate GoTrue/mailer rejections into brutalist terminal copy.
+// Raw provider internals only surface as a truncated fallback.
+function mapSupabaseError(raw: string): string {
+  const msg = raw.toLowerCase();
+  if (msg.includes('already registered') || msg.includes('already exists'))
+    return 'DUPLICATE // OPERATOR EXISTS — AUTHENTICATE INSTEAD';
+  if (msg.includes('invalid login') || msg.includes('invalid credentials'))
+    return 'REJECTED // BAD CREDENTIALS — CHECK EMAIL / PASSPHRASE';
+  if (msg.includes('email not confirmed') || msg.includes('not confirmed'))
+    return 'PENDING // EMAIL UNCONFIRMED — CHECK INBOX FOR TRANSMISSION';
+  if (msg.includes('email address') && msg.includes('invalid'))
+    return 'REJECTED // OPERATOR EMAIL INVALID — CHECK DOMAIN / MAILER POLICY';
+  if (msg.includes('password'))
+    return 'REJECTED // PASSPHRASE TOO WEAK — MIN 6 CHARS';
+  if (msg.includes('rate limit') || msg.includes('too many') || msg.includes('over request'))
+    return 'THROTTLED // TOO MANY ATTEMPTS — WAIT THEN RETRY';
+  if (msg.includes('confirm') || msg.includes('verif'))
+    return 'PENDING // CHECK INBOX FOR CONFIRMATION TRANSMISSION';
+  return `REJECTED // ${raw.toUpperCase().slice(0, 120)}`;
+}
+
 function normalizeEmail(raw: unknown): string {
   return String(raw ?? '')
     .normalize('NFC')
@@ -16,30 +43,50 @@ function normalizeEmail(raw: unknown): string {
     .toLowerCase();
 }
 
-function parseCredentials(formData: FormData) {
+function parseCredentials(formData: FormData): { email: string; password: string } | AuthResult {
   const email = normalizeEmail(formData.get('email'));
   const password = String(formData.get('password') ?? '');
   const parsed = emailSchema.safeParse(email);
-  if (!parsed.success) throw new Error('Enter a valid operator email.');
-  if (!password) throw new Error('Passphrase is required.');
+  if (!parsed.success) return fail('REJECTED // OPERATOR EMAIL INVALID');
+  if (!password) return fail('REJECTED // PASSPHRASE REQUIRED');
   return { email: parsed.data, password };
 }
 
-export async function signInAction(formData: FormData) {
-  const supabase = await createClient();
-  const { email, password } = parseCredentials(formData);
+function isAuthFailure(
+  value: { email: string; password: string } | AuthResult,
+): value is AuthResult {
+  return 'ok' in value;
+}
 
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) throw new Error(error.message);
+export async function signInAction(
+  _prevState: AuthResult,
+  formData: FormData,
+): Promise<AuthResult> {
+  const supabase = await createClient();
+  const creds = parseCredentials(formData);
+  if (isAuthFailure(creds)) return creds;
+
+  const { error } = await supabase.auth.signInWithPassword({
+    email: creds.email,
+    password: creds.password,
+  });
+  if (error) return fail(mapSupabaseError(error.message));
   redirect('/dashboard');
 }
 
-export async function signUpAction(formData: FormData) {
+export async function signUpAction(
+  _prevState: AuthResult,
+  formData: FormData,
+): Promise<AuthResult> {
   const supabase = await createClient();
-  const { email, password } = parseCredentials(formData);
+  const creds = parseCredentials(formData);
+  if (isAuthFailure(creds)) return creds;
 
-  const { error } = await supabase.auth.signUp({ email, password });
-  if (error) throw new Error(error.message);
+  const { error } = await supabase.auth.signUp({
+    email: creds.email,
+    password: creds.password,
+  });
+  if (error) return fail(mapSupabaseError(error.message));
   redirect('/dashboard');
 }
 
