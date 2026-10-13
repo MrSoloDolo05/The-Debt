@@ -1,0 +1,114 @@
+:root {
+  --void: #080808;
+  --slate: #121214;
+  --line: #27272a;
+  --paper: #fafafa;
+  --dim: #a1a1aa;
+  --amber: #ffb703;
+}
+
+* {
+  border-radius: 0 !important;
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--void);
+}
+
+body {
+  background: var(--void);
+  color: var(--paper);
+  margin: 0;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+::selection {
+  background: var(--amber);
+  color: #000;
+}
+
+.mono-meta {
+  font-family: ui-monospace, 'Cascadia Mono', Menlo, monospace;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--dim);
+}
+
+.brut-cell {
+  border: 1px solid var(--line);
+  background: var(--slate);
+  padding: 1rem;
+}
+
+.brut-banner {
+  border: 2px solid var(--paper);
+  background: var(--void);
+}
+
+.brut-input {
+  background: var(--slate);
+  border: 1px solid var(--paper);
+  color: var(--paper);
+  padding: 0.6rem;
+  width: 100%;
+  font-family: ui-monospace, Menlo, monospace;
+  outline: none;
+}
+
+.brut-input:focus {
+  border-color: var(--amber);
+}
+
+.brut-input::placeholder {
+  color: #52525b;
+}
+
+select.brut-input option {
+  background: var(--slate);
+  color: var(--paper);
+}
+
+.brut-btn {
+  background: #000;
+  color: var(--paper);
+  border: 1px solid var(--paper);
+  padding: 0.6rem;
+  cursor: pointer;
+  font-family: ui-monospace, Menlo, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.75rem;
+}
+
+.brut-btn:hover {
+  background: var(--paper);
+  color: #000;
+}
+
+.brut-btn-amber {
+  background: var(--amber);
+  color: #000;
+  border: 1px solid var(--amber);
+}
+
+.brut-btn-amber:hover {
+  background: var(--paper);
+  border-color: var(--paper);
+  color: #000;
+}
+
+.wire-grid {
+  background-image:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.grotesk {
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 0.9;
+  text-transform: uppercase;
+}
