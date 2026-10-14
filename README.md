@@ -1,7 +1,6 @@
 # The Debt — Broker Ledger
 
-Production: https://<project_name>.vercel.app
-<!-- TODO(you): replace with the real Vercel URL before Monday freeze, e.g. https://the-debt.vercel.app -->
+Production: https://the-debt.vercel.app
 
 ## What it is
 
@@ -9,9 +8,8 @@ Secure multi-tenant ledger for brokers managing **clients** (debtors) and **mark
 
 ## Demo login
 
-- Operator A (primary demo): `demo@clinic.example` / ask owner for password
-- Operator B (RLS proof): `demo2@clinic.example` / ask owner for password
-<!-- TODO(you): replace with real demo accounts. Never commit passwords. -->
+- Operator A (primary demo): `paul.head@thedebt-academics.test` / ask owner for password
+- Operator B (RLS proof): `tristan.ta@thedebt-academics.test` / ask owner for password
 
 ## Run steps
 
