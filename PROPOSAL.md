@@ -32,3 +32,10 @@
 2. **Phase 2 (Core Logic & Data Flow):** Server actions, Zod schemas, basic form validation, entity relationships.
 3. **Phase 3 (Analytics & RLS Audit):** Visual charts, two-user proof validation, error boundary implementation.
 4. **Phase 4 (UI Refinement):** Layout polishing, deferred styling enhancements, and final smoke testing.
+
+## 6. What Changed Since Writing
+
+- Login now returns inline terminal errors via `useActionState` instead of throwing.
+- Operator emails are normalized (trim/lowercase/invisible-char strip) and Zod-validated before Supabase calls.
+- Dashboard adds full edit (rename/reassign) for clients and markers; charts carry axis labels, zero baselines, and one-line decision captions.
+- RLS ships as `supabase/migrations/001_debt_rls.sql` so the two-user proof is reproducible.

@@ -5,6 +5,8 @@ import {
   createMarkerAction,
   deleteClientAction,
   deleteMarkerAction,
+  updateClientAction,
+  updateMarkerAction,
 } from '@/actions';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/utils/supabase/server';
@@ -66,7 +68,14 @@ export default async function DashboardPage() {
         <div className="brut-cell" style={{ border: 'none' }}>
           <p className="mono-meta">[ LEVERAGE GROWTH ]</p>
           <h3 className="grotesk" style={{ fontSize: '1.5rem', margin: '0.5rem 0' }}>Is our leverage growing?</h3>
-          <div style={{ display: 'flex', alignItems: 'flex-end', height: '150px', gap: '0.5rem', borderBottom: '2px solid #fafafa', marginTop: '1rem' }}>
+          <p className="mono-meta">X: MONTH (ISSUED) · Y: MARKERS FROM 0</p>
+          <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
+            <div className="mono-meta" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '150px', paddingBottom: '1.4rem' }}>
+              <span>{maxMonthCount}</span>
+              <span>{Math.ceil(maxMonthCount / 2)}</span>
+              <span>0</span>
+            </div>
+          <div style={{ display: 'flex', alignItems: 'flex-end', height: '150px', gap: '0.5rem', borderBottom: '2px solid #fafafa', flex: 1 }}>
             {sortedMonths.length === 0 ? (
               <p className="mono-meta">No ledger data recorded yet.</p>
             ) : (
@@ -84,10 +93,12 @@ export default async function DashboardPage() {
               })
             )}
           </div>
+          </div>
+          <p className="mono-meta" style={{ marginTop: '0.75rem', color: '#fafafa' }}>READ: IF THE LAST 3 BARS FALL, HOLD OFF ON A SECOND COLLECTION DAY.</p>
         </div>
         <div className="brut-cell" style={{ border: 'none', borderLeft: '1px solid #27272a' }}>
           <p className="mono-meta">[ POWER CONCENTRATION ]</p>
-          <h3 className="grotesk" style={{ fontSize: '1.5rem', margin: '0.5rem 0' }}>Where is power held?</h3>
+          <h3 className="grotesk" style={{ fontSize: '1.5rem', margin: '0.5rem 0' }}>Where is our power concentrated?</h3>
           {totalMarkers === 0 ? (
             <p className="mono-meta">No markers issued to compute share.</p>
           ) : (
@@ -111,6 +122,7 @@ export default async function DashboardPage() {
               </div>
             </div>
           )}
+          <p className="mono-meta" style={{ marginTop: '0.75rem', color: '#fafafa' }}>READ: IF ONE FAVOR TYPE PASSES HALF, RENEGOTIATE BEFORE ISSUING MORE.</p>
         </div>
       </section>
 
@@ -163,13 +175,31 @@ export default async function DashboardPage() {
           <h3 className="grotesk" style={{ fontSize: '1.25rem' }}>DEBTORS ({clients?.length || 0})</h3>
           <ul style={{ listStyle: 'none', padding: 0, marginTop: '1rem', display: 'grid', gap: '0.5rem' }}>
             {clients?.map((client) => (
-              <li key={client.id} style={{ border: '1px solid #27272a', background: '#080808', padding: '0.75rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <div style={{ fontWeight: 900, textTransform: 'uppercase' }}>{client.name}</div>
-                  <div className="mono-meta">[{client.influence_tier}] <span style={{ color: client.status === 'Active' ? '#ffb703' : '#fafafa' }}>■ {client.status}</span></div>
+              <li key={client.id} style={{ border: '1px solid #27272a', background: '#080808', padding: '0.75rem', display: 'grid', gap: '0.5rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <div style={{ fontWeight: 900, textTransform: 'uppercase' }}>{client.name}</div>
+                    <div className="mono-meta">[{client.influence_tier}] <span style={{ color: client.status === 'Active' ? '#ffb703' : '#fafafa' }}>■ {client.status}</span></div>
+                  </div>
+                  <form action={deleteClientAction.bind(null, client.id)}>
+                    <button type="submit" className="brut-btn">[X]</button>
+                  </form>
                 </div>
-                <form action={deleteClientAction.bind(null, client.id)}>
-                  <button type="submit" className="brut-btn">[X]</button>
+                <form action={updateClientAction.bind(null, client.id)} style={{ display: 'grid', gap: 6 }}>
+                  <input name="name" type="text" required defaultValue={client.name} aria-label={`Rename ${client.name}`} className="brut-input" />
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: 6 }}>
+                    <select name="influence_tier" required defaultValue={client.influence_tier} className="brut-input">
+                      <option value="Local">Local</option>
+                      <option value="Federal">Federal</option>
+                      <option value="Global Syndicate">Global Syndicate</option>
+                    </select>
+                    <select name="status" required defaultValue={client.status} className="brut-input">
+                      <option value="Active">Active</option>
+                      <option value="Settled">Settled</option>
+                      <option value="In Default">In Default</option>
+                    </select>
+                    <button type="submit" className="brut-btn">RENAME</button>
+                  </div>
                 </form>
               </li>
             ))}
@@ -179,13 +209,34 @@ export default async function DashboardPage() {
           <h3 className="grotesk" style={{ fontSize: '1.25rem' }}>MARKERS ({markers?.length || 0})</h3>
           <ul style={{ listStyle: 'none', padding: 0, marginTop: '1rem', display: 'grid', gap: '0.5rem' }}>
             {markers?.map((marker) => (
-              <li key={marker.id} style={{ border: '1px solid #27272a', background: '#080808', padding: '0.75rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <div style={{ fontWeight: 900, textTransform: 'uppercase' }}>{marker.favor_type}</div>
-                  <div className="mono-meta">[LEVERAGE: {String(marker.leverage_value).padStart(2, '0')}/10] DEBTOR: {marker.clients?.name || 'UNKNOWN'} | {marker.status}</div>
+              <li key={marker.id} style={{ border: '1px solid #27272a', background: '#080808', padding: '0.75rem', display: 'grid', gap: '0.5rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <div style={{ fontWeight: 900, textTransform: 'uppercase' }}>{marker.favor_type}</div>
+                    <div className="mono-meta">[LEVERAGE: {String(marker.leverage_value).padStart(2, '0')}/10] DEBTOR: {marker.clients?.name || 'UNKNOWN'} | {marker.status}</div>
+                  </div>
+                  <form action={deleteMarkerAction.bind(null, marker.id)}>
+                    <button type="submit" className="brut-btn">[X]</button>
+                  </form>
                 </div>
-                <form action={deleteMarkerAction.bind(null, marker.id)}>
-                  <button type="submit" className="brut-btn">[X]</button>
+                <form action={updateMarkerAction.bind(null, marker.id)} style={{ display: 'grid', gap: 6 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+                    <select name="client_id" required defaultValue={marker.client_id} aria-label={`Reassign ${marker.favor_type}`} className="brut-input">
+                      {(clients ?? []).map((c) => (
+                        <option key={c.id} value={c.id}>{c.name} ({c.influence_tier})</option>
+                      ))}
+                    </select>
+                    <select name="status" required defaultValue={marker.status} className="brut-input">
+                      <option value="Outstanding">Outstanding</option>
+                      <option value="Called In">Called In</option>
+                      <option value="Defaulted">Defaulted</option>
+                    </select>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: 6 }}>
+                    <input name="favor_type" type="text" required defaultValue={marker.favor_type} aria-label="Favor type" className="brut-input" />
+                    <input name="leverage_value" type="number" min="1" max="10" required defaultValue={marker.leverage_value} aria-label="Leverage 1-10" className="brut-input" />
+                    <button type="submit" className="brut-btn">UPDATE</button>
+                  </div>
                 </form>
               </li>
             ))}
